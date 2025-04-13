@@ -126,52 +126,46 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const checkboxes = document.querySelectorAll('.product-checkbox');
-            const selectAll = document.getElementById('selectAll');
-            const subtotalEl = document.getElementById('subtotal');
-            const totalEl = document.getElementById('total');
-            const checkoutBtn = document.getElementById('checkoutBtn');
-            const quantityInputs = document.querySelectorAll('.quantity-input');
+    const checkboxes = document.querySelectorAll('.product-checkbox');
+    const selectAll = document.getElementById('selectAll');
+    const subtotalEl = document.getElementById('subtotal');
+    const totalEl = document.getElementById('total');
+    const checkoutBtn = document.getElementById('checkoutBtn');
 
-            function updateTotal() {
-                let subtotal = 0;
+    function updateTotal() {
+        let subtotal = 0;
 
-                checkboxes.forEach(checkbox => {
-                    if (checkbox.checked) {
-                        const row = checkbox.closest('tr');
-                        const price = parseFloat(row.querySelector('.quantity-input').dataset.price);
-                        const quantity = parseInt(row.querySelector('.quantity-input').value);
-                        subtotal += price * quantity;
-                    }
-                });
-
-                subtotalEl.innerText = 'Rp.' + subtotal.toLocaleString('id-ID');
-                totalEl.innerText = 'Rp.' + (subtotal + 5000).toLocaleString(
-                    'id-ID'); // Tambahan biaya tetap (opsional)
-                checkoutBtn.disabled = subtotal === 0;
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                // Get price directly from the data-price attribute we set on the checkbox
+                const price = parseFloat(checkbox.dataset.price);
+                subtotal += price;
             }
-
-            // Event listener untuk checkbox produk
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', updateTotal);
-            });
-
-            // Event listener untuk "Select All"
-            selectAll.addEventListener('change', function() {
-                checkboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
-                });
-                updateTotal();
-            });
-
-            // Event listener untuk perubahan quantity
-            quantityInputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    updateTotal();
-                });
-            });
-
-            updateTotal(); // Inisialisasi saat halaman dimuat
         });
+
+        // Format numbers with Indonesian number format
+        subtotalEl.innerText = 'Rp.' + subtotal.toLocaleString('id-ID');
+        totalEl.innerText = 'Rp.' + subtotal.toLocaleString('id-ID'); // No additional fee
+        
+        // Enable or disable checkout button based on selection
+        checkoutBtn.disabled = subtotal === 0;
+    }
+
+    // Event listener for product checkboxes
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateTotal);
+    });
+
+    // Event listener for "Select All" checkbox
+    selectAll.addEventListener('change', function() {
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateTotal();
+    });
+
+    // Initialize total when page loads
+    updateTotal();
+});
     </script>
 @endsection
