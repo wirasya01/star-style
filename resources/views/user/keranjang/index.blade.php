@@ -56,7 +56,11 @@
                                                 @endif
                                             </div>
                                             <div class="product__cart__item__text ms-3">
-                                                <h6 class="mb-1">{{ $item->produk->nama }}</h6>
+                                                <h6 class="mb-1">
+                                                    <a href="{{ route('keranjang.show', $item->id) }}" class="text-dark">
+                                                        {{ $item->produk->nama }}
+                                                    </a>
+                                                </h6>
                                                 <h5 class="text-danger">
                                                     Rp.{{ number_format($item->produk->harga, 0, ',', '.') }}</h5>
                                                 <p class="text-muted mb-0">Size: {{ $item->ukuran }}</p>

@@ -26,6 +26,9 @@ Route::group(['prefix' => 'user'], function () {
     Route::get('shop', function () {return view('user.shop');})->name('shop');
     Route::get('keranjang', [KeranjangController::class, 'index'])->name('keranjang.index');
     Route::post('keranjang', [KeranjangController::class, 'store'])->name('keranjang.store');
+    Route::get('keranjang/{id}', [KeranjangController::class, 'show'])->name('keranjang.show');
+    Route::get('keranjang/{id}/edit', [KeranjangController::class, 'edit'])->name('keranjang.edit');
+    Route::put('keranjang/{id}', [KeranjangController::class, 'update'])->name('keranjang.update');
     Route::delete('keranjang/{id}', [KeranjangController::class, 'destroy'])->name('keranjang.destroy');
     Route::get('/detailpesanan/{id}', function ($id) {
         $produk = App\Models\Produk::find($id);

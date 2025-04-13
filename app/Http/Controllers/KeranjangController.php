@@ -58,4 +58,30 @@ class KeranjangController extends Controller
 
         return redirect()->back()->with('error', 'Product not found in cart.');
     }
+
+    public function show($id)
+    {
+        $keranjang = Keranjang::findOrFail($id);
+        return view('user.keranjang.show', compact('keranjang'));
+    }
+
+    public function edit($id)
+    {
+        $keranjang = Keranjang::findOrFail($id);
+        return view('user.keranjang.edit', compact('keranjang'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'ukuran' => 'required|string',
+            'jumlah' => 'required|integer|min:1',
+        ]);
+
+        $keranjang = Keranjang::findOrFail($id);
+        $keranjang->update($validated);
+
+        return redirect()->route('keranjang.index')
+            ->with('success', 'Item keranjang berhasil diperbarui');
+    }
 }
