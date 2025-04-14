@@ -118,9 +118,9 @@
                                 <span class="text-danger fw-bold" id="total">Rp.0</span>
                             </li>
                         </ul>
-                        <button type="submit" class="btn btn-dark w-100 mt-3" id="checkoutBtn" disabled>
+                        <a href="{{ route('pembayaran') }}" class="btn btn-dark w-100 mt-3" id="checkoutBtn" disabled>
                             Proceed to Checkout
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>

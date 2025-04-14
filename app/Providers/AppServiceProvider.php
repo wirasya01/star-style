@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Midtrans\Config;
+
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,8 +19,13 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
-    {
-        //
-    }
+
+public function boot(): void
+{
+    Config::$serverKey = config('midtrans.server_key');
+    Config::$isProduction = config('midtrans.is_production');
+    Config::$isSanitized = config('midtrans.sanitize');
+    Config::$is3ds = config('midtrans.enable_3ds');
+}
+
 }

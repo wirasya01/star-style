@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('metode_pembayaran');
             $table->string('status_pembayaran');
             $table->date('tanggal_pembayaran')->nullable();
+            $table->string('alamat');
+            $table->string('no_telp');
             $table->timestamps();
 
             $table->foreign('pesanan_id')->references('id')->on('pesanans')->onDelete('cascade');

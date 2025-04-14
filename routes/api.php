@@ -19,3 +19,6 @@ Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanct
 Route::apiResource('kategori', KategoriController::class);
 // produk
 Route::apiResource('produk', ProdukController::class);
+
+Route::post('midtrans/callback', [MidtransController::class, 'paymentCallback'])->name('midtrans.callback');
+Route::post('/midtrans/create-transaction', [MidtransController::class, 'createTransaction']);

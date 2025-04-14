@@ -40,17 +40,17 @@ class PesananController extends Controller
         $pesanan->save();
 
         // Add order items from cart
-        $cartItems = \App\Models\Keranjang::with('product')
-            ->where('user_id', auth()->id())
+        $cartItems = \App\Models\Keranjang::with('produk')
+            ->where('pembeli_id', auth()->id())
             ->get();
 
         foreach ($cartItems as $item) {
             $detail = new \App\Models\DetailPesanan();
             $detail->pesanan_id = $pesanan->id;
-            $detail->produk_id = $item->product_id;
-            $detail->jumlah = $item->quantity;
-            $detail->harga = $item->product->price;
-            $detail->subtotal = $item->product->price * $item->quantity;
+            $detail->produk_id = $item->produk_id;
+            $detail->jumlah = $item->jumlah;
+            $detail->harga = $item->produk->price;
+            $detail->subtotal = $item->produk->price * $item->jumlah;
             $detail->save();
 
             // Remove item from cart
