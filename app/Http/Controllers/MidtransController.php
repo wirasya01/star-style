@@ -1,24 +1,30 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Pesanan;
+use Midtrans\Config;
+use Midtrans\Snap;
+
 class MidtransController extends Controller
 {
     public function __construct()
     {
-        // Konfigurasi Midtrans
         Config::$serverKey    = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized  = config('midtrans.is_sanitized');
         Config::$is3ds        = config('midtrans.is_3ds');
+    }
 
+    public function checkoutPage($id)
+    {
+        $pesanan = Pesanan::with('pembeli')->findOrFail($id);
+        return view('user.checkout', compact('pesanan'));
     }
 
     public function createTransaction($id)
     {
-        // Ambil data pesanan
         $pesanan = Pesanan::with('pembeli')->findOrFail($id);
 
-        // Buat parameter Snap
         $params = [
             'transaction_details' => [
                 'order_id'     => 'PESANAN-' . $pesanan->id,
@@ -31,7 +37,6 @@ class MidtransController extends Controller
             ],
         ];
 
-        // Ambil Snap Token
         $snapToken = Snap::getSnapToken($params);
 
         return response()->json([

@@ -43,7 +43,7 @@
                                             <div class="product-pic me-3">
                                                 @if ($item->produk->gambar && is_array(json_decode($item->produk->gambar, true)))
                                                     <img src="{{ asset('storage/' . json_decode($item->produk->gambar, true)[0]) }}"
-                                                        alt="{{ $item->produk->nama }}" width="80" class="img-fluid rounded-3">
+                                                         alt="{{ $item->produk->nama }}" width="80" class="img-fluid rounded-3">
                                                 @else
                                                     <span>No Image</span>
                                                 @endif
@@ -83,111 +83,115 @@
                             </li>
                         </ul>
                     </div>
-                        <button type="button" class="btn btn-dark w-100 pay-button">Confirm Payment</button>
+
+                    <!-- Tombol dengan pemesanan ID -->
+                    <button type="button"
+                            class="btn btn-dark w-100 pay-button"
+                            data-id="{{ $pemesananId }}">
+                        Confirm Payment
+                    </button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Midtrans -->
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
+    <!-- Midtrans Script -->
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+            data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
 
-<script>
-// Payment handling
-    document.addEventListener('DOMContentLoaded', function() {
-        const payButtons = document.querySelectorAll('.pay-button');
-        payButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const pemesananId = this.getAttribute('data-id');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const payButtons = document.querySelectorAll('.pay-button');
 
-                Swal.fire({
-                    title: 'Memproses Pembayaran',
-                    text: 'Mohon tunggu...',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
+            payButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const pemesananId = this.getAttribute('data-id');
 
-                fetch('/api/midtrans/create-transaction', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        pemesanan_id: pemesananId
-                    })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.snap_token) {
-                        Swal.close();
-
-                        window.snap.pay(data.snap_token, {
-                            onSuccess: function(result) {
-                                Swal.fire({
-                                    title: 'Success',
-                                    text: 'Pembayaran berhasil!',
-                                    icon: 'success',
-                                    timer: 2000,
-                                    timerProgressBar: true,
-                                    showConfirmButton: false
-                                }).then(() => location.reload());
-                            },
-                            onPending: function(result) {
-                                Swal.fire({
-                                    title: 'Info',
-                                    text: 'Pembayaran sedang diproses',
-                                    icon: 'info',
-                                    timer: 2000,
-                                    timerProgressBar: true,
-                                    showConfirmButton: false
-                                }).then(() => location.reload());
-                            },
-                            onError: function(result) {
-                                Swal.fire({
-                                    title: 'Error',
-                                    text: 'Pembayaran gagal!',
-                                    icon: 'error',
-                                    timer: 2000,
-                                    timerProgressBar: true,
-                                    showConfirmButton: false
-                                });
-                            },
-                            onClose: function() {
-                                Swal.fire({
-                                    title: 'Info',
-                                    text: 'Pembayaran dibatalkan',
-                                    icon: 'info',
-                                    timer: 2000,
-                                    timerProgressBar: true,
-                                    showConfirmButton: false
-                                });
-                            }
-                        });
-                    } else {
-                        throw new Error(data.error || 'Failed to get payment token');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
                     Swal.fire({
-                        title: 'Error',
-                        text: 'Terjadi kesalahan: ' + error.message,
-                        icon: 'error',
-                        confirmButtonText: 'OK'
+                        title: 'Memproses Pembayaran',
+                        text: 'Mohon tunggu...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    fetch('/api/midtrans/create-transaction', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ pemesanan_id: pemesananId })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.snap_token) {
+                            Swal.close();
+
+                            window.snap.pay(data.snap_token, {
+                                onSuccess: function (result) {
+                                    Swal.fire({
+                                        title: 'Success',
+                                        text: 'Pembayaran berhasil!',
+                                        icon: 'success',
+                                        timer: 2000,
+                                        timerProgressBar: true,
+                                        showConfirmButton: false
+                                    }).then(() => location.reload());
+                                },
+                                onPending: function (result) {
+                                    Swal.fire({
+                                        title: 'Info',
+                                        text: 'Pembayaran sedang diproses',
+                                        icon: 'info',
+                                        timer: 2000,
+                                        timerProgressBar: true,
+                                        showConfirmButton: false
+                                    }).then(() => location.reload());
+                                },
+                                onError: function (result) {
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: 'Pembayaran gagal!',
+                                        icon: 'error',
+                                        timer: 2000,
+                                        timerProgressBar: true,
+                                        showConfirmButton: false
+                                    });
+                                },
+                                onClose: function () {
+                                    Swal.fire({
+                                        title: 'Info',
+                                        text: 'Pembayaran dibatalkan',
+                                        icon: 'info',
+                                        timer: 2000,
+                                        timerProgressBar: true,
+                                        showConfirmButton: false
+                                    });
+                                }
+                            });
+                        } else {
+                            throw new Error(data.error || 'Gagal mendapatkan snap token');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Terjadi kesalahan: ' + error.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
                     });
                 });
             });
         });
-    });
     </script>
-
 @endsection

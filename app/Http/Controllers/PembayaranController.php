@@ -1,7 +1,7 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Models\Keranjang;
 use App\Models\Pembayaran;
 use App\Models\Pesanan;
 use Illuminate\Http\Request;
@@ -18,33 +18,27 @@ class PembayaranController extends Controller
         'pesanan_id', 'metode_pembayaran', 'status_pembayaran', 'tanggal_pembayaran',
     ];
 
-    /**
-     * Display a listing of the resource for admin.
-     */
+    // ✅ ADMIN: Tampilkan semua pembayaran
     public function index()
     {
         $pembayarans = Pembayaran::latest()->with('pesanan')->get();
         return view('admin.pembayaran.index', compact('pembayarans'));
     }
 
-    /**
-     * Show the form for creating a new resource for admin.
-     */
+    // ✅ ADMIN: Tampilkan form create pembayaran
     public function create()
     {
         $pesanans = Pesanan::all();
         return view('admin.pembayaran.create', compact('pesanans'));
     }
 
-    /**
-     * Store a newly created resource in storage for admin.
-     */
+    // ✅ ADMIN: Simpan data pembayaran baru
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'pesanan_id' => 'required|exists:pesanans,id',
-            'metode_pembayaran' => 'required|string|max:255',
-            'status_pembayaran' => 'required|string|max:255',
+            'pesanan_id'         => 'required|exists:pesanans,id',
+            'metode_pembayaran'  => 'required|string|max:255',
+            'status_pembayaran'  => 'required|string|max:255',
             'tanggal_pembayaran' => 'nullable|date',
         ]);
 
@@ -54,34 +48,28 @@ class PembayaranController extends Controller
             ->with('success', 'Pembayaran berhasil dibuat.');
     }
 
-    /**
-     * Display the specified resource for admin.
-     */
+    // ✅ ADMIN: Detail pembayaran
     public function show($id)
     {
         $pembayaran = Pembayaran::with('pesanan')->findOrFail($id);
         return view('admin.pembayaran.show', compact('pembayaran'));
     }
 
-    /**
-     * Show the form for editing the specified resource for admin.
-     */
+    // ✅ ADMIN: Form edit pembayaran
     public function edit($id)
     {
         $pembayaran = Pembayaran::findOrFail($id);
-        $pesanans = Pesanan::all();
+        $pesanans   = Pesanan::all();
         return view('admin.pembayaran.edit', compact('pembayaran', 'pesanans'));
     }
 
-    /**
-     * Update the specified resource in storage for admin.
-     */
+    // ✅ ADMIN: Update pembayaran
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'pesanan_id' => 'required|exists:pesanans,id',
-            'metode_pembayaran' => 'required|string|max:255',
-            'status_pembayaran' => 'required|string|max:255',
+            'pesanan_id'         => 'required|exists:pesanans,id',
+            'metode_pembayaran'  => 'required|string|max:255',
+            'status_pembayaran'  => 'required|string|max:255',
             'tanggal_pembayaran' => 'nullable|date',
         ]);
 
@@ -92,9 +80,7 @@ class PembayaranController extends Controller
             ->with('success', 'Pembayaran berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage for admin.
-     */
+    // ✅ ADMIN: Hapus pembayaran
     public function destroy($id)
     {
         $pembayaran = Pembayaran::findOrFail($id);
@@ -104,9 +90,7 @@ class PembayaranController extends Controller
             ->with('success', 'Pembayaran berhasil dihapus.');
     }
 
-    /**
-     * Display the payment page for user with selected products.
-     */
+    // ✅ USER: Halaman pembayaran (otomatis buat pesanan)
     public function showPaymentPage(Request $request)
     {
         $selectedProductIds = $request->input('selected_products', []);
@@ -117,7 +101,7 @@ class PembayaranController extends Controller
 
         $userId = Auth::id();
 
-        $selectedItems = \App\Models\Keranjang::with('produk')
+        $selectedItems = Keranjang::with('produk')
             ->whereIn('id', $selectedProductIds)
             ->where('pembeli_id', $userId)
             ->get();
@@ -126,30 +110,47 @@ class PembayaranController extends Controller
             return redirect()->route('keranjang.index')->with('error', 'No valid products selected.');
         }
 
+        // Hitung total
         $subtotal = 0;
         foreach ($selectedItems as $item) {
             $subtotal += $item->produk->harga * $item->jumlah;
         }
-        $shipping = 10000; // fixed shipping cost or calculate dynamically
-        $total = $subtotal + $shipping;
+        $shipping = 10000;
+        $total    = $subtotal + $shipping;
+
+        // Simpan pesanan
+        $pesanan = Pesanan::create([
+            'pembeli_id'    => $userId,
+            'total_harga'   => $total,
+            'status'        => 'pending',
+            'tanggal_pesan' => now(), // ✅ ditambahkan
+        ]);
+
+        // Simpan detail item ke pesanan_items (jika kamu punya relasi)
+        foreach ($selectedItems as $item) {
+            $pesanan->items()->create([
+                'produk_id' => $item->produk_id,
+                'jumlah'    => $item->jumlah,
+                'ukuran'    => $item->ukuran,
+            ]);
+        }
 
         return view('user.pembayaran', [
             'selectedItems' => $selectedItems,
-            'subtotal' => $subtotal,
-            'shipping' => $shipping,
-            'total' => $total,
+            'subtotal'      => $subtotal,
+            'shipping'      => $shipping,
+            'total'         => $total,
+            'pemesananId'   => $pesanan->id, // 👉 dikirim ke view
         ]);
     }
 
-    /**
-     * Store payment from user.
-     */
+    // ✅ USER: Simpan data pembayaran user
     public function storeUserPayment(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'pesanan_id' => 'required|exists:pesanans,id',
-            'metode_pembayaran' => 'required|string|max:255',
-            'status_pembayaran' => 'required|string|max:255',
+            'pesanan_id'         => 'required|exists:pesanans,id',
+            'metode_pembayaran'  => 'required|string|max:255',
+            'status_pembayaran'  => 'required|string|max:255',
             'tanggal_pembayaran' => 'nullable|date',
         ]);
 
@@ -158,28 +159,26 @@ class PembayaranController extends Controller
         }
 
         Pembayaran::create([
-            'pesanan_id' => $request->input('pesanan_id'),
-            'metode_pembayaran' => $request->input('metode_pembayaran'),
-            'status_pembayaran' => $request->input('status_pembayaran'),
+            'pesanan_id'         => $request->input('pesanan_id'),
+            'metode_pembayaran'  => $request->input('metode_pembayaran'),
+            'status_pembayaran'  => $request->input('status_pembayaran'),
             'tanggal_pembayaran' => $request->input('tanggal_pembayaran'),
         ]);
 
         return redirect()->route('home')->with('success', 'Pembayaran berhasil diproses.');
     }
 
-    /**
-     * Get all payments as JSON for API or other uses.
-     */
+    // ✅ API: Get semua pembayaran
     public function getPayments()
     {
         $payments = Pembayaran::with('pesanan')->get()->map(function ($payment) {
             return [
-                'id' => $payment->id,
-                'pesanan_id' => $payment->pesanan_id,
-                'metode_pembayaran' => $payment->metode_pembayaran,
-                'status_pembayaran' => $payment->status_pembayaran,
+                'id'                 => $payment->id,
+                'pesanan_id'         => $payment->pesanan_id,
+                'metode_pembayaran'  => $payment->metode_pembayaran,
+                'status_pembayaran'  => $payment->status_pembayaran,
                 'tanggal_pembayaran' => $payment->tanggal_pembayaran,
-                'pesanan' => $payment->pesanan,
+                'pesanan'            => $payment->pesanan,
             ];
         });
 

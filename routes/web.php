@@ -4,6 +4,7 @@ use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\MidtransController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -39,8 +40,8 @@ Route::group(['prefix' => 'user'], function () {
         $produk = App\Models\Produk::find($id);
         return view('user.detailpesanan', compact('produk'));
     })->name('detailpesanan');
-
-    // Add pembayaran routes
     Route::get('pembayaran', [PembayaranController::class, 'showPaymentPage'])->name('pembayaran.show');
     Route::post('pembayaran', [PembayaranController::class, 'storeUserPayment'])->name('pembayaran');
+    Route::get('/checkout/{id}', [MidtransController::class, 'checkoutPage'])->name('checkout.page');
+
 });

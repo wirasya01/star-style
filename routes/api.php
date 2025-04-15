@@ -20,5 +20,5 @@ Route::apiResource('kategori', KategoriController::class);
 // produk
 Route::apiResource('produk', ProdukController::class);
 
-Route::post('midtrans/callback', [MidtransController::class, 'paymentCallback'])->name('midtrans.callback');
-Route::post('/midtrans/create-transaction', [MidtransController::class, 'createTransaction']);
+Route::post('/midtrans/create-transaction/{id}', [MidtransController::class, 'createTransaction']);
+
