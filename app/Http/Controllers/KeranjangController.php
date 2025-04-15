@@ -84,4 +84,27 @@ class KeranjangController extends Controller
         return redirect()->route('keranjang.index')
             ->with('success', 'Item keranjang berhasil diperbarui');
     }
+
+    public function checkoutSelected(Request $request)
+    {
+        $request->validate([
+            'selected_products' => 'required|array',
+            'selected_products.*' => 'integer|exists:keranjangs,id',
+        ]);
+
+        $userId = Auth::id();
+
+        // Fetch selected cart items for the authenticated user
+        $selectedItems = Keranjang::with('produk')
+            ->whereIn('id', $request->selected_products)
+            ->where('pembeli_id', $userId)
+            ->get();
+
+        if ($selectedItems->isEmpty()) {
+            return redirect()->route('keranjang.index')->with('error', 'No valid products selected.');
+        }
+
+        // Pass selected items to the payment page view
+        return view('user.pembayaran', ['selectedItems' => $selectedItems]);
+    }
 }

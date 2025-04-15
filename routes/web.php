@@ -1,10 +1,9 @@
 <?php
 
-use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\KategoriController;
-use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\PembayaranController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +21,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', AdminMiddleware::cla
     Route::resource('produk', ProdukController::class);
 });
 
+
 // User Routes
 Route::group(['prefix' => 'user'], function () {
     Route::get('home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -36,11 +36,8 @@ Route::group(['prefix' => 'user'], function () {
         $produk = App\Models\Produk::find($id);
         return view('user.detailpesanan', compact('produk'));
     })->name('detailpesanan');
-    Route::get('pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
-    Route::post('pembayaran/process', [PembayaranController::class, 'process'])->name('pembayaran.process');
-    Route::post('checkout/selected', [PembayaranController::class, 'checkoutSelected'])->name('checkout.selected');
-Route::post('/midtrans/create-transaction', [MidtransController::class, 'createTransaction']);
-Route::post('/midtrans/callback', [MidtransController::class, 'paymentCallback']);
 
+    // Add pembayaran routes
+    Route::get('pembayaran', [PembayaranController::class, 'show'])->name('pembayaran.show');
+    Route::post('pembayaran', [PembayaranController::class, 'store'])->name('pembayaran');
 });
-

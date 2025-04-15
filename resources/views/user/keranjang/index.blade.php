@@ -22,7 +22,7 @@
     <!-- Shopping Cart Section -->
     <section class="shopping-cart spad">
         <div class="container">
-            {{-- <form id="cartForm" action="{{ route('checkout') }}" method="POST"> --}}
+            <form id="cartForm" action="{{ route('pembayaran.show') }}" method="GET">
             @csrf
             <div class="row">
                 <div class="col-lg-8">
@@ -118,9 +118,9 @@
                                 <span class="text-danger fw-bold" id="total">Rp.0</span>
                             </li>
                         </ul>
-                        <a href="{{ route('pembayaran') }}" class="btn btn-dark w-100 mt-3" id="checkoutBtn" disabled>
+                        <button type="submit" class="btn btn-dark w-100 mt-3" id="checkoutBtn" disabled>
                             Proceed to Checkout
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
