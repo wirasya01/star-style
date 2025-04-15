@@ -19,6 +19,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', AdminMiddleware::cla
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('kategori', KategoriController::class);
     Route::resource('produk', ProdukController::class);
+    Route::resource('pembayaran', PembayaranController::class);
+
+
 });
 
 
@@ -38,6 +41,6 @@ Route::group(['prefix' => 'user'], function () {
     })->name('detailpesanan');
 
     // Add pembayaran routes
-    Route::get('pembayaran', [PembayaranController::class, 'show'])->name('pembayaran.show');
-    Route::post('pembayaran', [PembayaranController::class, 'store'])->name('pembayaran');
+    Route::get('pembayaran', [PembayaranController::class, 'showPaymentPage'])->name('pembayaran.show');
+    Route::post('pembayaran', [PembayaranController::class, 'storeUserPayment'])->name('pembayaran');
 });
