@@ -110,10 +110,12 @@ class PembayaranController extends Controller
             return redirect()->route('keranjang.index')->with('error', 'No valid products selected.');
         }
 
-        // Hitung total
+        // Hitung total dan jumlah
         $subtotal = 0;
+        $totalJumlah = 0;
         foreach ($selectedItems as $item) {
             $subtotal += $item->produk->harga * $item->jumlah;
+            $totalJumlah += $item->jumlah;
         }
         $shipping = 10000;
         $total    = $subtotal + $shipping;
@@ -122,13 +124,14 @@ class PembayaranController extends Controller
         $pesanan = Pesanan::create([
             'pembeli_id'    => $userId,
             'total_harga'   => $total,
+            'jumlah'        => $totalJumlah,
             'status'        => 'pending',
             'tanggal_pesan' => now(), // ✅ ditambahkan
         ]);
 
-        // Simpan detail item ke pesanan_items (jika kamu punya relasi)
+        // Simpan detail item ke detailPesanans
         foreach ($selectedItems as $item) {
-            $pesanan->items()->create([
+            $pesanan->detailPesanans()->create([
                 'produk_id' => $item->produk_id,
                 'jumlah'    => $item->jumlah,
                 'ukuran'    => $item->ukuran,
