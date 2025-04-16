@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('tanggal_pesan');
             $table->decimal('total_harga', 10, 2);
             $table->integer('jumlah');
-            $table->string('metode_pembayaran');
+            $table->string('metode_pembayaran')->default('Midtrans');
             $table->string('status');
             
             $table->timestamps();

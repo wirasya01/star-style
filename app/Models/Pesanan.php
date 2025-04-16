@@ -9,8 +9,7 @@ class Pesanan extends Model
     use HasFactory;
 
     protected $table    = 'pesanans';
-    protected $fillable = ['pembeli_id', 'tanggal_pesan', 'total_harga', 'jumlah', 'status'];
-
+    protected $fillable = ['pembeli_id', 'tanggal_pesan', 'total_harga', 'jumlah', 'status', 'metode_pembayaran'];
 
     public function pembeli()
     {

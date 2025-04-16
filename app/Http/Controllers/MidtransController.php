@@ -2,8 +2,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pesanan;
+use Illuminate\Http\Request;
 use Midtrans\Config;
 use Midtrans\Snap;
+use Illuminate\Support\Facades\Log;
 
 class MidtransController extends Controller
 {
@@ -21,14 +23,20 @@ class MidtransController extends Controller
         return view('user.checkout', compact('pesanan'));
     }
 
-    public function createTransaction($id)
+    public function createTransaction(Request $request)
     {
-        $pesanan = Pesanan::with('pembeli')->findOrFail($id);
+        $pemesananId = $request->input('pemesanan_id');
+
+        $pesanan = Pesanan::with('pembeli')->find($pemesananId);
+
+        if (!$pesanan) {
+            return response()->json(['error' => 'Pesanan tidak ditemukan'], 404);
+        }
 
         $params = [
             'transaction_details' => [
-                'order_id'     => 'PESANAN-' . $pesanan->id,
-                'gross_amount' => $pesanan->total_harga,
+                'order_id'     => 'PESANAN-' . $pesanan->id . '-' . time(),
+                'gross_amount' => (int) $pesanan->total_harga,
             ],
             'customer_details'    => [
                 'first_name' => $pesanan->pembeli->name ?? 'Pembeli',
@@ -36,6 +44,8 @@ class MidtransController extends Controller
                 'phone'      => $pesanan->pembeli->phone ?? '081234567890',
             ],
         ];
+
+        Log::info('Midtrans transaction params:', $params);
 
         $snapToken = Snap::getSnapToken($params);
 

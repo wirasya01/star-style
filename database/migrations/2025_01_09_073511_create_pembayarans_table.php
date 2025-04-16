@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('pembayarans', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('pesanan_id');
-            $table->string('metode_pembayaran');
             $table->string('status_pembayaran');
             $table->date('tanggal_pembayaran')->nullable();
+            $table->string('metode_pembayaran')->default('Midtrans');
             $table->timestamps();
 
             $table->foreign('pesanan_id')->references('id')->on('pesanans')->onDelete('cascade');

@@ -62,7 +62,8 @@ class PesananController extends Controller
                 'produk_id'  => $item->produk_id,
                 'jumlah'     => $item->jumlah,
                 'harga'      => $item->produk->price,
-                'subtotal'   => $item->produk->price * $item->jumlah,
+                'ukuran'     => $item->ukuran,
+                'variasi'    => $item->variasi ?? 'default',
             ]);
 
             $item->delete(); // hapus dari keranjang

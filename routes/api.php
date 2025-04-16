@@ -20,5 +20,7 @@ Route::apiResource('kategori', KategoriController::class);
 // produk
 Route::apiResource('produk', ProdukController::class);
 
-Route::post('/midtrans/create-transaction/{id}', [MidtransController::class, 'createTransaction']);
+use App\Http\Controllers\MidtransController;
+
+Route::post('/midtrans/create-transaction', [MidtransController::class, 'createTransaction']);
 
