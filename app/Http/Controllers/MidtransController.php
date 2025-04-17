@@ -3,9 +3,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Pesanan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Midtrans\Config;
 use Midtrans\Snap;
-use Illuminate\Support\Facades\Log;
 
 class MidtransController extends Controller
 {
@@ -29,29 +29,36 @@ class MidtransController extends Controller
 
         $pesanan = Pesanan::with('pembeli')->find($pemesananId);
 
-        if (!$pesanan) {
-            return response()->json(['error' => 'Pesanan tidak ditemukan'], 404);
+        if (! $pesanan || ! $pesanan->total_harga) {
+            return response()->json(['error' => 'Pesanan tidak valid.'], 404);
         }
 
-        $params = [
-            'transaction_details' => [
-                'order_id'     => 'PESANAN-' . $pesanan->id . '-' . time(),
-                'gross_amount' => (int) $pesanan->total_harga,
-            ],
-            'customer_details'    => [
-                'first_name' => $pesanan->pembeli->name ?? 'Pembeli',
-                'email'      => $pesanan->pembeli->email ?? 'pembeli@example.com',
-                'phone'      => $pesanan->pembeli->phone ?? '081234567890',
-            ],
-        ];
+        try {
+            $orderId = 'PESANAN-' . $pesanan->id;
 
-        Log::info('Midtrans transaction params:', $params);
+            $params = [
+                'transaction_details' => [
+                    'order_id'     => $orderId,
+                    'gross_amount' => (int) $pesanan->total_harga,
+                ],
+                'customer_details'    => [
+                    'first_name' => $pesanan->pembeli->name ?? 'Pembeli',
+                    'email'      => $pesanan->pembeli->email ?? 'pembeli@example.com',
+                    'phone'      => $pesanan->pembeli->phone ?? '081234567890',
+                ],
+            ];
 
-        $snapToken = Snap::getSnapToken($params);
+            Log::info('Midtrans transaction params:', $params);
 
-        return response()->json([
-            'snap_token' => $snapToken,
-            'order_id'   => 'PESANAN-' . $pesanan->id,
-        ]);
+            $snapToken = Snap::getSnapToken($params);
+
+            return response()->json([
+                'snap_token' => $snapToken,
+                'order_id'   => $orderId,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Midtrans Snap Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Gagal membuat transaksi.'], 500);
+        }
     }
 }

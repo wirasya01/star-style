@@ -84,11 +84,18 @@
                             </ul>
 
                             <!-- Confirm Button -->
-                            <button type="button"
+                            <form action="{{ route('user.pembayaran.store') }}" method="POST" id="payment-form">
+                                @csrf
+                                <input type="hidden" name="pesanan_id" value="{{ $pemesananId }}">
+                                <input type="hidden" name="metode_pembayaran" value="credit_card"> <!-- Example value -->
+                                <input type="hidden" name="status_pembayaran" value="pending"> <!-- Example value -->
+                                <input type="hidden" name="tanggal_pembayaran" value="{{ now()->format('Y-m-d H:i:s') }}">
+                                @csrf
+                                <button type="button"
                                 class="btn btn-dark btn-lg w-100 rounded-pill shadow-sm pay-button animate__animated animate__pulse"
                                 data-id="{{ $pemesananId }}">
                                 <i class="bi bi-credit-card me-2"></i>Confirm Payment
-                            </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -118,7 +125,7 @@
                     didOpen: () => Swal.showLoading()
                 });
 
-                fetch('/api/midtrans/create-transaction', {
+                fetch('/user/api/midtrans/create-transaction', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -158,6 +165,35 @@
                     console.error(error);
                     Swal.fire('Error', error.message, 'error');
                 });
+            });
+        });
+    </script>
+
+    <!-- JavaScript for form submission -->
+    <script>
+        document.querySelector('.pay-button').addEventListener('click', function() {
+            fetch('/user/pembayaran', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    pesanan_id: {{ $pemesananId }},
+                    metode_pembayaran: 'Midtrans', // Example value
+                    status_pembayaran: 'pending', // Example value
+                    tanggal_pembayaran: '{{ now()->format('Y-m-d H:i:s') }}'
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Gagal terhubung ke server.');
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error(error);
             });
         });
     </script>
