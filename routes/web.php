@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\KeranjangController;
-use App\Http\Controllers\ProdukController;
-use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\MidtransController;
+use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\ProdukController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -22,9 +22,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', AdminMiddleware::cla
     Route::resource('produk', ProdukController::class);
     Route::resource('pembayaran', PembayaranController::class);
 
-
 });
-
 
 // User Routes
 Route::group(['prefix' => 'user'], function () {
@@ -41,7 +39,10 @@ Route::group(['prefix' => 'user'], function () {
         return view('user.detailpesanan', compact('produk'));
     })->name('detailpesanan');
     Route::get('pembayaran', [PembayaranController::class, 'showPaymentPage'])->name('pembayaran.show');
-    Route::post('pembayaran', [PembayaranController::class, 'storeUserPayment'])->name('pembayaran');
+    Route::delete('pembayaran', [PembayaranController::class, 'showPaymentPage'])->name('pembayaran.destroy');
+    Route::post('/user/pembayaran', [PembayaranController::class, 'storeUserPayment'])->name('user.pembayaran.store');
     Route::get('/checkout/{id}', [MidtransController::class, 'checkoutPage'])->name('checkout.page');
+    // Jika kamu simpan di web.php:
+    Route::post('/api/midtrans/create-transaction', [MidtransController::class, 'createTransaction']);
 
 });

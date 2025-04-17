@@ -27,59 +27,43 @@ class PesananController extends Controller
         return view('user.checkout', compact('produk'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'total'   => 'required|numeric',
-            'payment' => 'required|string',
-            'alamat'  => 'required|string',
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'selected_products' => 'required|array',
+        'selected_products.*' => 'integer|exists:keranjangs,id',
+    ]);
+
+    $userId = Auth::id();
+    $selectedItems = Keranjang::with('produk')
+        ->whereIn('id', $validated['selected_products'])
+        ->where('pembeli_id', $userId)
+        ->get();
+
+    // Create a new order
+    $pesanan = Pesanan::create([
+        'pembeli_id' => $userId,
+        'total_harga' => $selectedItems->sum(function($item) {
+            return $item->produk->harga * $item->jumlah;
+        }),
+        'status' => 'pending',
+        'tanggal_pesan' => now(),
+    ]);
+
+    // Save order details
+    foreach ($selectedItems as $item) {
+        DetailPesanan::create([
+            'pesanan_id' => $pesanan->id,
+            'produk_id'  => $item->produk_id,
+            'jumlah'     => $item->jumlah,
+            'harga'      => $item->produk->harga,
+            'ukuran'     => $item->ukuran,
         ]);
-
-        $cartItems = Keranjang::with('produk')
-            ->where('pembeli_id', auth()->id())
-            ->get();
-
-        if ($cartItems->isEmpty()) {
-            return redirect()->route('keranjang.index')->with('error', 'Keranjang Anda kosong.');
-        }
-
-        $jumlahTotalItem = $cartItems->sum('jumlah');
-
-        // Simpan pesanan
-        $pesanan = Pesanan::create([
-            'pembeli_id'        => auth()->id(),
-            'tanggal_pesan'     => now(),
-            'total_harga'       => $request->total,
-            'jumlah'            => $jumlahTotalItem,
-            'metode_pembayaran' => $request->payment,
-            'status'            => 'Pending',
-        ]);
-
-        // Simpan detail pesanan
-        foreach ($cartItems as $item) {
-            DetailPesanan::create([
-                'pesanan_id' => $pesanan->id,
-                'produk_id'  => $item->produk_id,
-                'jumlah'     => $item->jumlah,
-                'harga'      => $item->produk->price,
-                'ukuran'     => $item->ukuran,
-                'variasi'    => $item->variasi ?? 'default',
-            ]);
-
-            $item->delete(); // hapus dari keranjang
-        }
-
-        // Simpan pembayaran
-        Pembayaran::create([
-            'pesanan_id'         => $pesanan->id,
-            'metode_pembayaran'  => $request->payment,
-            'status_pembayaran'  => 'Pending',
-            'tanggal_pembayaran' => now(),
-        ]);
-
-        return redirect()->route('pesanan.show', $pesanan->id)
-            ->with('success', 'Pesanan berhasil dibuat!');
     }
+
+    return redirect()->route('pembayaran.show', ['selected_products' => $validated['selected_products']])
+        ->with('success', 'Order created successfully!');
+}
 
     public function show($id)
     {

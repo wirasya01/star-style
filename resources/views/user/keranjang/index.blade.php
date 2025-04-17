@@ -22,7 +22,7 @@
     <!-- Shopping Cart Section -->
     <section class="shopping-cart spad">
         <div class="container">
-            <form id="cartForm" action="{{ route('pembayaran.show') }}" method="GET">
+            <form id="cartForm" action="{{ route('pembayaran.show') }}" method="POST">
             @csrf
             <div class="row">
                 <div class="col-lg-8">

@@ -1,17 +1,94 @@
 @extends('user.layout.layout')
 
 @section('content')
-    <!-- Breadcrumb Section -->
-    <section class="breadcrumb-option">
+    <!-- Breadcrumb -->
+    <section class="breadcrumb-option py-3 bg-light" data-aos="fade-down">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="breadcrumb__text">
-                        <h4>Payment</h4>
-                        <div class="breadcrumb__links">
-                            <a href="{{ route('home') }}">Home</a>
-                            <a href="{{ route('keranjang.index') }}">Cart</a>
-                            <span>Payment</span>
+            <h4 class="fw-bold">Payment</h4>
+            <div class="breadcrumb__links">
+                <a href="{{ route('home') }}" class="text-decoration-none text-dark">Home</a>
+                <a href="{{ route('keranjang.index') }}" class="text-decoration-none text-dark">Cart</a>
+                <span class="text-muted">Payment</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Section -->
+    <section class="payment-section spad py-5">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Left: Produk -->
+                <div class="col-lg-8" data-aos="fade-up">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-4">🛍️ Selected Products</h5>
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Size</th>
+                                            <th>Qty</th>
+                                            <th>Price</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($selectedItems as $item)
+                                            <tr>
+                                                <td class="d-flex align-items-center">
+                                                    <div class="me-3">
+                                                        @if ($item->produk->gambar && is_array(json_decode($item->produk->gambar, true)))
+                                                            <img src="{{ asset('storage/' . json_decode($item->produk->gambar, true)[0]) }}"
+                                                                alt="{{ $item->produk->nama }}" width="70"
+                                                                class="img-thumbnail rounded-3 shadow-sm">
+                                                        @else
+                                                            <span>No Image</span>
+                                                        @endif
+                                                    </div>
+                                                    <div><strong>{{ $item->produk->nama }}</strong></div>
+                                                </td>
+                                                <td>{{ $item->ukuran }}</td>
+                                                <td>{{ $item->jumlah }}</td>
+                                                <td>Rp{{ number_format($item->produk->harga, 0, ',', '.') }}</td>
+                                                <td class="text-danger fw-bold">
+                                                    Rp{{ number_format($item->produk->harga * $item->jumlah, 0, ',', '.') }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Ringkasan -->
+                <div class="col-lg-4" data-aos="fade-left">
+                    <div class="card shadow-lg border-0 bg-white">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-4">🧾 Order Summary</h5>
+                            <ul class="list-group mb-4">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Subtotal
+                                    <span class="text-danger fw-semibold">Rp{{ number_format($subtotal, 0, ',', '.') }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Shipping
+                                    <span class="text-danger fw-semibold">Rp{{ number_format($shipping, 0, ',', '.') }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center fw-bold fs-5">
+                                    Total
+                                    <span class="text-danger">Rp{{ number_format($total, 0, ',', '.') }}</span>
+                                </li>
+                            </ul>
+
+                            <!-- Confirm Button -->
+                            <button type="button"
+                                class="btn btn-dark btn-lg w-100 rounded-pill shadow-sm pay-button animate__animated animate__pulse"
+                                data-id="{{ $pemesananId }}">
+                                <i class="bi bi-credit-card me-2"></i>Confirm Payment
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -19,179 +96,79 @@
         </div>
     </section>
 
-    <!-- Payment Section -->
-    <section class="payment-section spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8">
-                    <h5>Selected Products</h5>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Size</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($selectedItems as $item)
-                                    <tr>
-                                        <td class="d-flex align-items-center">
-                                            <div class="product-pic me-3">
-                                                @if ($item->produk->gambar && is_array(json_decode($item->produk->gambar, true)))
-                                                    <img src="{{ asset('storage/' . json_decode($item->produk->gambar, true)[0]) }}"
-                                                         alt="{{ $item->produk->nama }}" width="80" class="img-fluid rounded-3">
-                                                @else
-                                                    <span>No Image</span>
-                                                @endif
-                                            </div>
-                                            <div>
-                                                <h6>{{ $item->produk->nama }}</h6>
-                                            </div>
-                                        </td>
-                                        <td>{{ $item->ukuran }}</td>
-                                        <td>{{ $item->jumlah }}</td>
-                                        <td>Rp.{{ number_format($item->produk->harga, 0, ',', '.') }}</td>
-                                        <td class="text-danger fw-bold">
-                                            Rp.{{ number_format($item->produk->harga * $item->jumlah, 0, ',', '.') }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    <!-- Midtrans Snap.js -->
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
 
-                <div class="col-lg-4">
-                    <div class="payment-summary p-4 border bg-light">
-                        <h5>Summary</h5>
-                        <ul class="list-unstyled">
-                            <li class="d-flex justify-content-between">
-                                <span>Subtotal</span>
-                                <span class="text-danger fw-bold">Rp.{{ number_format($subtotal, 0, ',', '.') }}</span>
-                            </li>
-                            <li class="d-flex justify-content-between">
-                                <span>Shipping</span>
-                                <span class="text-danger fw-bold">Rp.{{ number_format($shipping, 0, ',', '.') }}</span>
-                            </li>
-                            <li class="d-flex justify-content-between">
-                                <span>Total</span>
-                                <span class="text-danger fw-bold">Rp.{{ number_format($total, 0, ',', '.') }}</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Tombol dengan pemesanan ID -->
-                    <button type="button"
-                            class="btn btn-dark w-100 pay-button"
-                            data-id="{{ $pemesananId }}">
-                        Confirm Payment
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Midtrans Script -->
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js"
-            data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const payButtons = document.querySelectorAll('.pay-button');
+            const payButton = document.querySelector('.pay-button');
 
-            payButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const pemesananId = this.getAttribute('data-id');
+            payButton.addEventListener('click', function () {
+                const pemesananId = this.getAttribute('data-id');
 
-                    Swal.fire({
-                        title: 'Memproses Pembayaran',
-                        text: 'Mohon tunggu...',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
+                Swal.fire({
+                    title: 'Memproses Pembayaran',
+                    text: 'Mohon tunggu...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
 
-                    fetch('/api/midtrans/create-transaction', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ pemesanan_id: pemesananId })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.snap_token) {
-                            Swal.close();
+                fetch('/api/midtrans/create-transaction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ pemesanan_id: pemesananId })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Gagal terhubung ke server.');
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.close();
+                    console.log("Snap Token:", data.snap_token); // Debug
 
-                            window.snap.pay(data.snap_token, {
-                                onSuccess: function (result) {
-                                    Swal.fire({
-                                        title: 'Success',
-                                        text: 'Pembayaran berhasil!',
-                                        icon: 'success',
-                                        timer: 2000,
-                                        timerProgressBar: true,
-                                        showConfirmButton: false
-                                    }).then(() => location.reload());
-                                },
-                                onPending: function (result) {
-                                    Swal.fire({
-                                        title: 'Info',
-                                        text: 'Pembayaran sedang diproses',
-                                        icon: 'info',
-                                        timer: 2000,
-                                        timerProgressBar: true,
-                                        showConfirmButton: false
-                                    }).then(() => location.reload());
-                                },
-                                onError: function (result) {
-                                    Swal.fire({
-                                        title: 'Error',
-                                        text: 'Pembayaran gagal!',
-                                        icon: 'error',
-                                        timer: 2000,
-                                        timerProgressBar: true,
-                                        showConfirmButton: false
-                                    });
-                                },
-                                onClose: function () {
-                                    Swal.fire({
-                                        title: 'Info',
-                                        text: 'Pembayaran dibatalkan',
-                                        icon: 'info',
-                                        timer: 2000,
-                                        timerProgressBar: true,
-                                        showConfirmButton: false
-                                    });
-                                }
-                            });
-                        } else {
-                            throw new Error(data.error || 'Gagal mendapatkan snap token');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'Terjadi kesalahan: ' + error.message,
-                            icon: 'error',
-                            confirmButtonText: 'OK'
+                    if (data.snap_token) {
+                        window.snap.pay(data.snap_token, {
+                            onSuccess: function () {
+                                Swal.fire('Success', 'Pembayaran berhasil!', 'success').then(() => location.reload());
+                            },
+                            onPending: function () {
+                                Swal.fire('Pending', 'Pembayaran sedang diproses.', 'info').then(() => location.reload());
+                            },
+                            onError: function () {
+                                Swal.fire('Error', 'Pembayaran gagal!', 'error');
+                            },
+                            onClose: function () {
+                                Swal.fire('Dibatalkan', 'Anda membatalkan pembayaran.', 'info');
+                            }
                         });
-                    });
+                    } else {
+                        throw new Error('Token pembayaran tidak ditemukan.');
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    Swal.fire('Error', error.message, 'error');
                 });
             });
+        });
+    </script>
+
+    <!-- AOS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
         });
     </script>
 @endsection

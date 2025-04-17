@@ -1,143 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Glassmorphism Register Form</title>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
-    <!-- Stylesheet -->
-    <style media="screen">
-        *,
-        *:before,
-        *:after {
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background-color: #080710;
-        }
-        .background {
-            width: 430px;
-            height: 520px;
-            position: absolute;
-            transform: translate(-50%, -50%);
-            left: 50%;
-            top: 50%;
-        }
-        .background .shape {
-            height: 200px;
-            width: 200px;
-            position: absolute;
-            border-radius: 50%;
-        }
-        .shape:first-child {
-            background: linear-gradient(#1845ad, #23a2f6);
-            left: -80px;
-            top: -80px;
-        }
-        .shape:last-child {
-            background: linear-gradient(to right, #ff512f, #f09819);
-            right: -30px;
-            bottom: -80px;
-        }
-        form {
-            height: 620px;
-            width: 400px;
-            background-color: rgba(255, 255, 255, 0.13);
-            position: absolute;
-            transform: translate(-50%, -50%);
-            top: 50%;
-            left: 50%;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
-            padding: 50px 35px;
-        }
-        form * {
-            font-family: 'Poppins', sans-serif;
-            color: #ffffff;
-            letter-spacing: 0.5px;
-            outline: none;
-            border: none;
-        }
-        form h3 {
-            font-size: 32px;
-            font-weight: 500;
-            line-height: 42px;
-            text-align: center;
-        }
-        label {
-            display: block;
-            margin-top: 20px;
-            font-size: 16px;
-            font-weight: 500;
-        }
-        input {
-            display: block;
-            height: 50px;
-            width: 100%;
-            background-color: rgba(255, 255, 255, 0.07);
-            border-radius: 3px;
-            padding: 0 10px;
-            margin-top: 8px;
-            font-size: 14px;
-            font-weight: 300;
-        }
-        ::placeholder {
-            color: #e5e5e5;
-        }
-        button {
-            margin-top: 20px;
-            width: 100%;
-            background-color: #ffffff;
-            color: #080710;
-            padding: 15px 0;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Starboy Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, #000000, #1a1a1a);
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      color: #fff;
+    }
+
+    /* Animated stars background */
+    .stars {
+      background: transparent url('https://i.ibb.co/kHLKTW7/stars.gif') repeat;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.6;
+      animation: scrollStars 60s linear infinite;
+    }
+
+    @keyframes scrollStars {
+      from { background-position: 0 0; }
+      to { background-position: -1000px 1000px; }
+    }
+
+    .glow, .glow2 {
+      position: absolute;
+      border-radius: 50%;
+      z-index: 0;
+      filter: blur(70px);
+    }
+
+    .glow {
+      width: 500px;
+      height: 500px;
+      background: rgba(255, 255, 255, 0.07);
+      top: -150px;
+      left: -150px;
+      animation: pulse 6s ease-in-out infinite;
+    }
+
+    .glow2 {
+      width: 350px;
+      height: 350px;
+      background: rgba(255, 255, 255, 0.05);
+      bottom: -100px;
+      right: -100px;
+      animation: pulse 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .form-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 430px;
+      padding: 45px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+      z-index: 1;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s ease;
+    }
+
+    .form-container:hover {
+      box-shadow: 0 0 60px rgba(255, 255, 255, 0.2);
+    }
+
+    .form-container h3 {
+      text-align: center;
+      font-size: 26px;
+      margin-bottom: 30px;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #ffffff, #999999);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    label {
+      font-size: 14px;
+      margin-top: 15px;
+      display: block;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    input::placeholder {
+      color: #bbb;
+    }
+
+    .invalid-feedback {
+      font-size: 13px;
+      color: #ff6b6b;
+      margin-top: 4px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(90deg, #ffffff, #999999);
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      margin-top: 25px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(90deg, #ffffff, #cccccc);
+    }
+  </style>
 </head>
 <body>
-    <div class="background">
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
-        <h3>Register Here</h3>
+  <div class="stars"></div>
+  <div class="glow"></div>
+  <div class="glow2"></div>
 
-        <label for="name">Name</label>
-        <input id="name" type="text" placeholder="Name" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
-        @error('name')
-        <span class="invalid-feedback" role="alert">
-            <strong>{{ $message }}</strong>
-        </span>
-        @enderror
+  <form class="form-container" method="POST" action="{{ route('register') }}">
+    @csrf
+    <h3>🌟 Register to Starboy</h3>
 
-        <label for="email">Email</label>
-        <input id="email" type="email" placeholder="Email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
-        @error('email')
-        <span class="invalid-feedback" role="alert">
-            <strong>{{ $message }}</strong>
-        </span>
-        @enderror
+    <label for="name">Name</label>
+    <input id="name" type="text" placeholder="Your Name" name="name" value="{{ old('name') }}" required>
+    @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
 
-        <label for="password">Password</label>
-        <input id="password" type="password" placeholder="Password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
-        @error('password')
-        <span class="invalid-feedback" role="alert">
-            <strong>{{ $message }}</strong>
-        </span>
-        @enderror
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="you@example.com" name="email" value="{{ old('email') }}" required>
+    @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
 
-        <label for="password-confirm">Confirm Password</label>
-        <input id="password-confirm" type="password" placeholder="Confirm Password" class="form-control" name="password_confirmation" required autocomplete="new-password">
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="********" name="password" required>
+    @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
 
-        <button type="submit">Register</button>
-    </form>
+    <label for="phone">Phone Number</label>
+    <input id="phone" type="text" placeholder="08xxxxxxx" name="phone" value="{{ old('phone') }}" required>
+    @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
+
+    <label for="address">Address</label>
+    <input id="address" type="text" placeholder="Your Address" name="address" value="{{ old('address') }}" required>
+    @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
+
+    <label for="password-confirm">Confirm Password</label>
+    <input id="password-confirm" type="password" placeholder="********" name="password_confirmation" required>
+
+    <button type="submit"><i class="fa-solid fa-star me-1"></i> Register</button>
+  </form>
 </body>
 </html>

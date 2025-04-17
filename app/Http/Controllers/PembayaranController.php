@@ -224,7 +224,7 @@ class PembayaranController extends Controller
             'jumlah'        => $totalJumlah,
             'status'        => 'pending',
             'tanggal_pesan' => now(),
-            'metode_pembayaran'  => 'Midtrans',
+            // 'metode_pembayaran'  => 'Midtrans',
         ]);
 
         // Simpan detail item ke detailPesanans
