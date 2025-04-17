@@ -44,5 +44,6 @@ Route::group(['prefix' => 'user'], function () {
     Route::get('/checkout/{id}', [MidtransController::class, 'checkoutPage'])->name('checkout.page');
     // Jika kamu simpan di web.php:
     Route::post('/api/midtrans/create-transaction', [MidtransController::class, 'createTransaction']);
+    Route::post('/api/midtrans/callback', [MidtransController::class, 'callback']);
 
 });

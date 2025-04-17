@@ -22,5 +22,7 @@ Route::apiResource('produk', ProdukController::class);
 
 use App\Http\Controllers\MidtransController;
 
-// Midtrans transaction route
 Route::post('midtrans/create-transaction', [MidtransController::class, 'createTransaction']);
+
+// Midtrans callback route
+Route::post('midtrans/callback', [MidtransController::class, 'callback']);

@@ -9,6 +9,26 @@ use Midtrans\Snap;
 
 class MidtransController extends Controller
 {
+    public function callback(Request $request)
+    {
+        $serverKey = config('midtrans.server_key');
+        $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
+
+        if ($hashed === $request->signature_key) {
+            // Verification successful, update order status based on order_id
+            $orderId = $request->order_id;
+            $transactionStatus = $request->transaction_status;
+
+            // Update payment data in the database according to $orderId and $transactionStatus
+            $pesanan = Pesanan::where('id', $orderId)->first();
+            if ($pesanan) {
+                $pesanan->status = $transactionStatus; // Update the status accordingly
+                $pesanan->save();
+            }
+        }
+
+        return response()->json(['message' => 'Callback received']);
+    }
     public function __construct()
     {
         Config::$serverKey    = config('midtrans.server_key');
