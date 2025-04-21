@@ -25,6 +25,32 @@ class ProdukController extends Controller
     }
 
     /**
+     * Display products for user shop page, optionally filtered by category.
+     */
+    public function userShop(Request $request)
+    {
+        $kategori = Kategori::all();
+
+        $query = Produk::query();
+
+        if ($request->has('kategori_id') && $request->kategori_id != '') {
+            $query->where('kategori_id', $request->kategori_id);
+        }
+
+        if ($request->has('search') && $request->search != '') {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'LIKE', '%' . $search . '%')
+                  ->orWhere('deskripsi', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        $produks = $query->get();
+
+        return view('user.shop', compact('kategori', 'produks'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

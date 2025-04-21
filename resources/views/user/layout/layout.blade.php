@@ -23,7 +23,22 @@
     <link rel="stylesheet" href="{{ asset('assets/css/slicknav.min.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
+<script>
+    function toggleProfileDropdown() {
+        const dropdown = document.getElementById('profileDropdown');
+        dropdown.classList.toggle('show-dropdown');
+    }
+
+    // Optional: klik di luar menu akan menutup dropdown
+    document.addEventListener('click', function (e) {
+        const profile = document.querySelector('.profile-menu');
+        if (!profile.contains(e.target)) {
+            document.getElementById('profileDropdown').classList.remove('show-dropdown');
+        }
+    });
+</script>
 
 <body>
     @include('user.layout.navbar')

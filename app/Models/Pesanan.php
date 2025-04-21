@@ -11,6 +11,10 @@ class Pesanan extends Model
     protected $table    = 'pesanans';
     protected $fillable = ['pembeli_id', 'tanggal_pesan', 'total_harga', 'jumlah', 'status', 'metode_pembayaran'];
 
+    protected $casts = [
+        'tanggal_pesan' => 'datetime',
+    ];
+
     public function pembeli()
     {
         return $this->belongsTo(User::class, 'pembeli_id');

@@ -21,7 +21,7 @@ class PembayaranController extends Controller
     // ✅ ADMIN: Tampilkan semua pembayaran
     public function index()
     {
-        $pembayarans = Pembayaran::latest()->with('pesanan')->get();
+        $pembayarans = Pembayaran::latest()->with('pesanan')->paginate(10);
         return view('admin.pembayaran.index', compact('pembayarans'));
     }
 

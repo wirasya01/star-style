@@ -11,23 +11,62 @@ class MidtransController extends Controller
 {
     public function callback(Request $request)
     {
+        Log::info('Midtrans callback received:', $request->all());
+
         $serverKey = config('midtrans.server_key');
-        $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
+        $input = $request->all();
 
-        if ($hashed === $request->signature_key) {
-            // Verification successful, update order status based on order_id
-            $orderId = $request->order_id;
-            $transactionStatus = $request->transaction_status;
+        $signature = hash("sha512", $input['order_id'] . $input['status_code'] . $input['gross_amount'] . $serverKey);
 
-            // Update payment data in the database according to $orderId and $transactionStatus
-            $pesanan = Pesanan::where('id', $orderId)->first();
-            if ($pesanan) {
-                $pesanan->status = $transactionStatus; // Update the status accordingly
-                $pesanan->save();
-            }
+        if ($signature !== $input['signature_key']) {
+            Log::warning('Midtrans callback signature mismatch', $input);
+            return response()->json(['message' => 'Invalid signature'], 403);
         }
 
-        return response()->json(['message' => 'Callback received']);
+        $orderId = $input['order_id'];
+        $transactionStatus = $input['transaction_status'];
+        $fraudStatus = $input['fraud_status'] ?? null;
+
+        $pesanan = Pesanan::where('id', $orderId)->first();
+
+        if (! $pesanan) {
+            Log::warning('Midtrans callback order not found', ['order_id' => $orderId]);
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        switch ($transactionStatus) {
+            case 'capture':
+                if ($fraudStatus === 'challenge') {
+                    $pesanan->status = 'challenge';
+                } else if ($fraudStatus === 'accept') {
+                    $pesanan->status = 'paid';
+                }
+                break;
+            case 'settlement':
+                $pesanan->status = 'paid';
+                break;
+            case 'pending':
+                $pesanan->status = 'pending';
+                break;
+            case 'deny':
+                $pesanan->status = 'deny';
+                break;
+            case 'expire':
+                $pesanan->status = 'expire';
+                break;
+            case 'cancel':
+                $pesanan->status = 'cancel';
+                break;
+            default:
+                $pesanan->status = $transactionStatus;
+                break;
+        }
+
+        $pesanan->save();
+
+        Log::info('Midtrans callback processed', ['order_id' => $orderId, 'status' => $pesanan->status]);
+
+        return response()->json(['message' => 'Callback processed']);
     }
     public function __construct()
     {
