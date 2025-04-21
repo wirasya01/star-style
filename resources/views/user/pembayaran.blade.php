@@ -84,7 +84,7 @@
                             </ul>
 
                             <!-- Confirm Button -->
-                            <form action="{{ route('user.pembayaran.store') }}" method="POST" id="payment-form">
+                            <form action="{{ route('pembayaran.store') }}" method="POST" id="payment-form">
                                 @csrf
                                 <input type="hidden" name="pesanan_id" value="{{ $pemesananId }}">
                                 <input type="hidden" name="metode_pembayaran" value="credit_card"> <!-- Example value -->
@@ -145,7 +145,7 @@
                     if (data.snap_token) {
                         window.snap.pay(data.snap_token, {
                             onSuccess: function () {
-                                Swal.fire('Success', 'Pembayaran berhasil!', 'success').then(() => location.reload());
+                                Swal.fire('Success', 'Pembayaran berhasil!', 'success');
                             },
                             onPending: function () {
                                 Swal.fire('Pending', 'Pembayaran sedang diproses.', 'info').then(() => location.reload());

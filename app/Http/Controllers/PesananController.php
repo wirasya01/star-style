@@ -110,4 +110,40 @@ class PesananController extends Controller
 
         return redirect()->route('pesanan.index')->with('success', 'Pesanan berhasil dihapus.');
     }
+
+    public function handlePaymentCallback(Request $request)
+    {
+        // Validasi callback dari gateway pembayaran
+        $data = $request->all();
+
+        // Misalnya, validasi signature key dari Midtrans
+        if ($this->isValidSignature($data)) {
+            $orderId           = $data['order_id'];
+            $transactionStatus = $data['transaction_status'];
+
+            // Cari pesanan berdasarkan ID
+            $pesanan = Pesanan::find($orderId);
+
+            if ($pesanan) {
+                // Perbarui status berdasarkan status transaksi
+                if ($transactionStatus === 'settlement') {
+                    $pesanan->status = 'selesai'; // Pembayaran berhasil
+                } elseif ($transactionStatus === 'pending') {
+                    $pesanan->status = 'pending'; // Pembayaran tertunda
+                } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'expire') {
+                    $pesanan->status = 'dibatalkan'; // Pembayaran dibatalkan atau kedaluwarsa
+                }
+
+                $pesanan->save();
+            }
+        }
+
+        return response()->json(['message' => 'Callback processed']);
+    }
+
+    private function isValidSignature($data)
+    {
+                     // Implementasikan validasi signature key dari gateway pembayaran
+        return true; // Contoh: ganti dengan logika validasi sebenarnya
+    }
 }

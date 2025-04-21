@@ -22,8 +22,7 @@
     <!-- Shopping Cart Section -->
     <section class="shopping-cart spad">
         <div class="container">
-            <form id="cartForm" action="{{ route('pembayaran.show') }}" method="POST">
-            @csrf
+            <form id="cartForm" action="{{ route('pembayaran.show') }}" method="GET">
             <div class="row">
                 <div class="col-lg-8">
                     <div class="shopping__cart__table table-responsive">
@@ -76,12 +75,15 @@
                                             Rp.{{ number_format($item->produk->harga * $item->jumlah, 0, ',', '.') }}
                                         </td>
                                         <td class="cart__close">
-                                            <form action="{{ route('keranjang.destroy', $item->id) }}" method="POST">
-                                                @csrf
+                                            </form>
+                                            <form action="{{ route('keranjang.destroy', $item->id) }}" method="POST" style="display:inline;">
                                                 @method('DELETE')
+                                                @csrf
                                                 <button type="submit" class="btn btn-link text-danger"><i
                                                         class="fas fa-times"></i></button>
                                             </form>
+                                            <form id="cartForm" action="{{ route('pembayaran.show') }}" method="POST">
+                                            @csrf
                                         </td>
                                     </tr>
                                 @endforeach
@@ -118,7 +120,7 @@
                                 <span class="text-danger fw-bold" id="total">Rp.0</span>
                             </li>
                         </ul>
-                        <button type="submit" class="btn btn-dark w-100 mt-3" id="checkoutBtn" disabled>
+                        <button type="submit" class="btn btn-dark w-100 mt-3" id="checkoutBtn" >
                             Proceed to Checkout
                         </button>
                     </div>

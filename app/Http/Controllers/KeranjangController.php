@@ -48,15 +48,12 @@ class KeranjangController extends Controller
 
     public function destroy($id)
     {
-        // Menghapus item dari keranjang berdasarkan ID
-        $keranjang = Keranjang::where('pembeli_id', Auth::id())->where('id', $id)->first();
+        $keranjang = Keranjang::findOrFail($id);
 
-        if ($keranjang) {
-            $keranjang->delete();
-            return redirect()->back()->with('success', 'Product removed from cart successfully!');
-        }
+        $keranjang->delete();
 
-        return redirect()->back()->with('error', 'Product not found in cart.');
+        return redirect()->route('keranjang.index')->with('success', 'Product deleted successfully!');
+
     }
 
     public function show($id)
@@ -88,7 +85,7 @@ class KeranjangController extends Controller
     public function checkoutSelected(Request $request)
     {
         $request->validate([
-            'selected_products' => 'required|array',
+            'selected_products'   => 'required|array',
             'selected_products.*' => 'integer|exists:keranjangs,id',
         ]);
 

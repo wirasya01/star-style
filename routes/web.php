@@ -28,7 +28,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', AdminMiddleware::cla
 });
 
 // User Routes
-Route::group(['prefix' => 'user'], function () {
+Route::group(['prefix' => 'user', 'middleware' => 'auth'], function () {
     Route::get('home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::get('shop', [App\Http\Controllers\ProdukController::class, 'userShop'])->name('shop');
     Route::get('keranjang', [KeranjangController::class, 'index'])->name('keranjang.index');
@@ -43,11 +43,12 @@ Route::group(['prefix' => 'user'], function () {
     })->name('detailpesanan');
     Route::get('pembayaran', [PembayaranController::class, 'showPaymentPage'])->name('pembayaran.show');
     Route::delete('pembayaran', [PembayaranController::class, 'showPaymentPage'])->name('pembayaran.destroy');
-    Route::post('/user/pembayaran', [PembayaranController::class, 'storeUserPayment'])->name('user.pembayaran.store');
+    Route::post('pembayaran', [PembayaranController::class, 'storeUserPayment'])->name('pembayaran.store');
+
     Route::get('/checkout/{id}', [MidtransController::class, 'checkoutPage'])->name('checkout.page');
     // Jika kamu simpan di web.php:
     Route::post('/api/midtrans/create-transaction', [MidtransController::class, 'createTransaction']);
-    Route::post('/api/midtrans/callback', [MidtransController::class, 'callback']);
+    Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
 
     // Added routes for PesananController
     Route::get('pesanan', [App\Http\Controllers\PesananController::class, 'index'])->name('pesanan.index');
